@@ -1,0 +1,26 @@
+#!/usr/bin/env python 3.6
+# -*- coding: utf-8 -*-
+import csv
+import os
+import glob
+import json
+from pathlib import Path
+with open('departements-france.csv', mode='r') as csvfile:
+    spamreader = csv.DictReader(csvfile)
+    for row in spamreader:
+        if os.path.isdir(row["nom_region"]) is False:
+            os.makedirs(row["nom_region"])
+        for element in os.listdir('.'):
+            if element == row["nom_region"]:
+                if os.path.isdir(row["nom_departement"]) is False:
+                    os.chdir(element)
+                    #print(element)
+                    os.makedirs(row["nom_departement"])
+                    os.chdir('..')
+
+with open('liste-des-immeubles-proteges-au-titre-des-monuments-historiques.json') as jsonfile:
+    monument = json.dumps(jsonfile, default=str)
+    for row in monument:
+        fichier = open('./' + row["fields"]["reg"] + "/" + row["fields"]["dpt_lettre"] + "/" + row["fields"]["tico"] + ".txt", 'wt')
+        fichier.writelines(row['fields']['reg'])
+        fichier.close()
