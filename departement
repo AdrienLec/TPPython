@@ -3,7 +3,9 @@
 import csv
 import os
 import json
+import re
 from pathlib import Path
+#Création de l'arborescence des fichiers Regions avec leurs Departements associés
 with open('departements-france.csv', mode='r') as csvfile:
     spamreader = csv.DictReader(csvfile)
     for row in spamreader:
@@ -15,13 +17,21 @@ with open('departements-france.csv', mode='r') as csvfile:
                     os.chdir(element)
                     os.makedirs(row["nom_departement"])
                     os.chdir('..')
-
+#Parcours du fichier JSon pour en extraire certaines données (re.search) et les associer dans les départements d'origine par la création d'un fichier txt
 with open('liste-des-immeubles-proteges-au-titre-des-monuments-historiques.json', encoding='utf-8') as jsonfile:
     monument = json.load(jsonfile)
     for row in monument:
+        tico = row["fields"]["tico"].replace("\'", " ")
+        def roi(strTico):
+            match = re.search('Hugues|Robert|Henri|Philippe|Louis|Jean|Charles', strTico)
+            if match:
+                result = True
+            else:
+                result = False
+            return result
         try:
-            if 'dpt_lettre'in row["fields"]:
-                fichier = open('./' + row["fields"]["reg"] + "/" + row["fields"]["dpt_lettre"] + "/" + row["fields"]["tico"].replace("\'", " ") + ".txt", 'wt')
+            if 'dpt_lettre' in row["fields"] and roi(tico) is True:
+                fichier = open('./' + row["fields"]["reg"] + "/" + row["fields"]["dpt_lettre"] + "/" + tico + ".txt", 'wt')
                 fichier.writelines(row['fields']['reg'])
                 fichier.close()
         except Exception:
