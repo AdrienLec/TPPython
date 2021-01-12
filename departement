@@ -5,7 +5,6 @@ import os
 import json
 import re
 from pathlib import Path
-#Création de l'arborescence des fichiers Regions avec leurs Departements associés
 with open('departements-france.csv', mode='r') as csvfile:
     spamreader = csv.DictReader(csvfile)
     for row in spamreader:
@@ -17,7 +16,7 @@ with open('departements-france.csv', mode='r') as csvfile:
                     os.chdir(element)
                     os.makedirs(row["nom_departement"])
                     os.chdir('..')
-#Parcours du fichier JSon pour en extraire certaines données (re.search) et les associer dans les départements d'origine par la création d'un fichier txt
+
 with open('liste-des-immeubles-proteges-au-titre-des-monuments-historiques.json', encoding='utf-8') as jsonfile:
     monument = json.load(jsonfile)
     for row in monument:
@@ -29,10 +28,16 @@ with open('liste-des-immeubles-proteges-au-titre-des-monuments-historiques.json'
             else:
                 result = False
             return result
+
         try:
             if 'dpt_lettre' in row["fields"] and roi(tico) is True:
                 fichier = open('./' + row["fields"]["reg"] + "/" + row["fields"]["dpt_lettre"] + "/" + tico + ".txt", 'wt')
-                fichier.writelines(row['fields']['reg'])
+                fichier.writelines("Nom: " + tico + "\n")
+                fichier.writelines("Description: " + row['fields']['stat'].replace("\'", " ") + "\n")
+                fichier.writelines("Commune: " + row['fields']['commune'] + "\n")
+                fichier.writelines("Localisation :" + "\n")
+                fichier.writelines("Latitude :" + row['geometry']['coordinates'][0])
+                fichier.writelines("Longitude :" + row['geometry']['coordinates'][1])
                 fichier.close()
         except Exception:
             pass
